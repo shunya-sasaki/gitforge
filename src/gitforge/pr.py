@@ -19,6 +19,7 @@ class PullRequest:
         self.app.command()(self.list)
         self.app.command()(self.create)
         self.app.command()(self.view)
+        self.app.command()(self.merge)
         self.app.command()(self.template)
 
     def _run(self, cmds: list[str]):
@@ -88,6 +89,19 @@ class PullRequest:
 
             case "Gitea":
                 cmds = ["tea", "pr", f"{number}"]
+        self._run(cmds)
+
+    def merge(
+        self,
+        number: Annotated[int, typer.Argument(help="Pull request number")],
+    ):
+        """Merge a pull request."""
+        match self.backend:
+            case "GitHub":
+                cmds = ["gh", "pr", "merge", f"{number}"]
+
+            case "Gitea":
+                cmds = ["tea", "pr", "merge", f"{number}"]
         self._run(cmds)
 
     def template(
