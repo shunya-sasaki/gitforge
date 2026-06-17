@@ -1,0 +1,68 @@
+[project]
+name = "gitforge"
+description = "Scan licenses and vulnerabilities of open source softwares."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.26.7",
+]
+dynamic = ["version"]
+
+[project.scripts]
+gf = "gitforge:run"
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.hooks.version]
+path = "src/gitforge/_version.py"
+template = '''
+version = "{version}"
+'''
+
+[tool.isort]
+force_single_line = true
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 79
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["D", "E", "F", "C90", "I"]
+fixable = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["gitforge"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+force-single-line = true
+combine-as-imports = true
+from-first = false
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+preview = false
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v"
+testpaths = ["tests"]

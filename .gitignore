@@ -1,0 +1,15 @@
+./**/node_modules
+**/__pycache__
+**/_version.py
+**/.ipynb_checkpoints
+**/*.egg-info
+**/.DS_Store
+/.mypy_cache
+/.vscode
+/.venv
+/.env
+/build
+/dist
+/sandbox
+!/.githooks/
+!/.gitignore
