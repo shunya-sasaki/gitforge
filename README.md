@@ -39,6 +39,7 @@ gf pr list                              # list pull requests
 gf pr create "Title" "Body"             # create a pull request
 gf pr create "Title" "Body" --base dev --label bug
 gf pr view 12                           # view PR #12
+gf pr merge 12                          # merge PR #12
 gf pr template                          # print the PR template
 ```
 
