@@ -1,6 +1,7 @@
 """Pull request commands wrapper class."""
 
 import subprocess
+from importlib import resources
 from pathlib import Path
 from typing import Annotated
 
@@ -124,10 +125,10 @@ class PullRequest:
         if pj_template_filepath.exists():
             content = pj_template_filepath.read_text()
         else:
-            template_filepath = (
-                Path(__file__).parent / "assets" / template_file
+            template_resource = resources.files("gitforge").joinpath(
+                "assets", template_file
             )
-            content = template_filepath.read_text()
+            content = template_resource.read_text()
         if create and not pj_template_filepath.exists():
             print("Create a template")
 

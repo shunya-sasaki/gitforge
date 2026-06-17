@@ -1,6 +1,7 @@
 """Issue commands wrapper class."""
 
 import subprocess
+from importlib import resources
 from pathlib import Path
 from typing import Annotated
 
@@ -109,11 +110,8 @@ class Issue:
         if pj_template_filepath.exists():
             content = pj_template_filepath.read_text()
         else:
-            template_filepath = (
-                Path(__file__).parent
-                / "assets"
-                / "ISSUE_TEMPLATE"
-                / template_file
+            template_resource = resources.files("gitforge").joinpath(
+                "assets", "ISSUE_TEMPLATE", template_file
             )
-            content = template_filepath.read_text()
+            content = template_resource.read_text()
         print(content)
