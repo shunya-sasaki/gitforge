@@ -37,8 +37,8 @@ class PullRequest:
 
     def create(
         self,
-        title: Annotated[str, typer.Argument(help="Supply a title")],
-        body: Annotated[str, typer.Argument(help="Supply a body")],
+        title: Annotated[str, typer.Option(help="Supply a title")],
+        body: Annotated[str, typer.Option(help="Supply a body")],
         base: Annotated[str, typer.Option(help="Target branch")] = "main",
         label: Annotated[
             str | None, typer.Option(help="Add label by name")
