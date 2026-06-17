@@ -1,6 +1,6 @@
 [project]
 name = "gitforge"
-description = "Scan licenses and vulnerabilities of open source softwares."
+description = "A unified CLI wrapper for git forges such as GitHub and Gitea."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

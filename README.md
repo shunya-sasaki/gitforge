@@ -4,7 +4,7 @@
 ![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&labelColor=gray&logoColor=white)
 ![Gitea](https://img.shields.io/badge/Gitea-609926?logo=gitea&labelColor=gray&logoColor=white)
 
-Wrapper command of Git forges such as GitHub, Gitea.
+A unified CLI wrapper for git forges such as GitHub and Gitea.
 
 ## 📦 Requirements
 
@@ -17,12 +17,54 @@ This program is a wapper of `gh` and `tea` that are CLI tools for Git forges.
 ## ⚙️ Setup
 
 ```sh
-uv tool install https://github.com/shunya-sasaki/gitforge
+uv tool install git+https://github.com/shunya-sasaki/gitforge
 ```
 
 ## 🚀 Usage
 
+`gitforge` auto-detects whether the current repository is hosted on
+GitHub or Gitea (from its `origin` remote) and forwards each command to
+the matching CLI (`gh` or `tea`). The same commands work on both forges.
+
+Run without arguments to see all available commands:
+
+```sh
+gf --help
+```
+
+### Pull requests
+
+```sh
+gf pr list                              # list pull requests
+gf pr create "Title" "Body"             # create a pull request
+gf pr create "Title" "Body" --base dev --label bug
+gf pr view 12                           # view PR #12
+gf pr template                          # print the PR template
+```
+
+### Issues
+
+```sh
+gf issue list                           # list issues
+gf issue create "Title" "Body"          # create an issue
+gf issue create "Title" "Body" --label bug
+gf issue view 7                         # view issue #7
+gf issue template --label bug           # print an issue template
+```
+
+### Labels & worktrees
+
+```sh
+gf label list                           # list labels
+gf worktree --help                      # manage git worktrees
+```
+
 ## 📚 Reference
+
+The upstream CLI tools that `gitforge` wraps:
+
+- [cli/cli](https://github.com/cli/cli) — `gh`, the official GitHub CLI
+- [gitea/tea](https://gitea.com/gitea/tea) — `tea`, the official Gitea CLI
 
 ## 📄 License
 
