@@ -18,6 +18,9 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/gitforge"]
+
 [tool.hatch.build.hooks.version]
 path = "src/gitforge/_version.py"
 template = '''
