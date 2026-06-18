@@ -38,11 +38,18 @@ class PullRequest:
 
     def create(
         self,
-        title: Annotated[str, typer.Option(help="Supply a title")],
-        body: Annotated[str, typer.Option(help="Supply a body")],
-        base: Annotated[str, typer.Option(help="Target branch")] = "main",
+        title: Annotated[
+            str, typer.Option("--title", "-t", help="Supply a title")
+        ],
+        body: Annotated[
+            str, typer.Option("--body", "-b", help="Supply a body")
+        ],
+        base: Annotated[
+            str, typer.Option("--base", "-B", help="Target branch")
+        ] = "main",
         label: Annotated[
-            str | None, typer.Option(help="Add label by name")
+            str | None,
+            typer.Option("--label", "-l", help="Add label by name"),
         ] = None,
     ):
         """Create a new pull request."""
