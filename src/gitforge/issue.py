@@ -35,10 +35,15 @@ class Issue:
 
     def create(
         self,
-        title: Annotated[str, typer.Option(help="Title for the issue")],
-        body: Annotated[str, typer.Option(help="Body for the issue")],
+        title: Annotated[
+            str, typer.Option("--title", "-t", help="Title for the issue")
+        ],
+        body: Annotated[
+            str, typer.Option("--body", "-b", help="Body for the issue")
+        ],
         label: Annotated[
-            str | None, typer.Option(help="Add labels by name")
+            str | None,
+            typer.Option("--label", "-l", help="Add labels by name"),
         ] = None,
     ):
         """Create a new issue."""
