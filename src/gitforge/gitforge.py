@@ -7,6 +7,7 @@ from typing import Literal
 
 import typer
 
+from gitforge.diff import Diff
 from gitforge.issue import Issue
 from gitforge.label import Label
 from gitforge.models import ForgeUrl
@@ -24,13 +25,15 @@ class GitForge:
         self.is_tea_available = self._is_installed("tea")
         self.backend = self._detect_backend(remote_name)
         self.app = typer.Typer(no_args_is_help=True)
-        pr = PullRequest(self.backend)
+        diff = Diff(self.backend)
         issue = Issue(self.backend)
         label = Label(self.backend)
+        pr = PullRequest(self.backend)
         worktree = Worktree(self.backend)
-        self.app.add_typer(pr.app, name="pr")
+        self.app.command(name="diff")(diff.diff)
         self.app.add_typer(issue.app, name="issue")
         self.app.add_typer(label.app, name="label")
+        self.app.add_typer(pr.app, name="pr")
         self.app.add_typer(worktree.app, name="worktree")
 
     def _is_installed(self, cmd: Literal["git", "gh", "tea"]) -> bool:
