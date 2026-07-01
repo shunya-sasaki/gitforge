@@ -138,7 +138,10 @@ class PullRequest:
             template_resource = resources.files("gitforge").joinpath(
                 "assets", template_file
             )
-            content = template_resource.read_text()
+            try:
+                content = template_resource.read_text()
+            except UnicodeDecodeError:
+                content = template_resource.read_text(encoding="utf-8")
         if create and not pj_template_filepath.exists():
             print("Create a template")
 
