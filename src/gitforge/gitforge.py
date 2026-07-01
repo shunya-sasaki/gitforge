@@ -44,7 +44,7 @@ class GitForge:
             return False
 
     def _detect_backend(
-        self, remote_name: str = "origin", limit: int = 255
+        self, remote_name: str = "origin", max_page: int = 255
     ) -> str | None:
         proc = subprocess.run(
             ["git", "remote", "get-url", remote_name], capture_output=True
@@ -77,31 +77,34 @@ class GitForge:
                 elif remote_url == forge_url.url:
                     return "GitHub"
         if self.is_tea_available:
-            proc = subprocess.run(
-                [
-                    "tea",
-                    "repo",
-                    "list",
-                    "-f",
-                    "ssh,url",
-                    "-o",
-                    "json",
-                    "--limit",
-                    f"{limit}",
-                ],
-                capture_output=True,
-            )
-            output = proc.stdout.decode("utf-8")
-            output_json = json.loads(output)
-            tea_urls = [
-                ForgeUrl(sshUrl=item["ssh"], url=item["url"])
-                for item in output_json
-            ]
-            for forge_url in tea_urls:
-                if remote_url == forge_url.sshUrl:
-                    return "Gitea"
-                elif remote_url == forge_url.url:
-                    return "Gitea"
+            for i_page in range(max_page):
+                proc = subprocess.run(
+                    [
+                        "tea",
+                        "repo",
+                        "list",
+                        "-f",
+                        "ssh,url",
+                        "-o",
+                        "json",
+                        "--page",
+                        f"{i_page + 1}",
+                    ],
+                    capture_output=True,
+                )
+                output = proc.stdout.decode("utf-8")
+                output_json = json.loads(output)
+                if len(output_json) == 0:
+                    break
+                tea_urls = [
+                    ForgeUrl(sshUrl=item["ssh"], url=item["url"])
+                    for item in output_json
+                ]
+                for forge_url in tea_urls:
+                    if remote_url == forge_url.sshUrl:
+                        return "Gitea"
+                    elif remote_url == forge_url.url:
+                        return "Gitea"
         return None
 
     def _run(self, cmds: list[str]):
