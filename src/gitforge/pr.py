@@ -126,12 +126,14 @@ class PullRequest:
         match self.backend:
             case "GitHub":
                 pj_forge_dirpath = Path(".github")
+                pj_template_filepath = pj_forge_dirpath / template_file
             case "Gitea":
                 pj_forge_dirpath = Path(".gitea")
-        pj_template_filepath = pj_forge_dirpath / template_file
+                pj_template_filepath = pj_forge_dirpath / template_file
+        content = None
         if pj_template_filepath.exists():
             content = pj_template_filepath.read_text()
-        else:
+        if content is None:
             template_resource = resources.files("gitforge").joinpath(
                 "assets", template_file
             )
