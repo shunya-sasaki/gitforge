@@ -109,12 +109,16 @@ class Issue:
                 pj_forge_dirpath = Path(".github")
             case "Gitea":
                 pj_forge_dirpath = Path(".gitea")
-        pj_template_filepath = (
-            pj_forge_dirpath / "ISSUE_TEMPLATE" / template_file
-        )
-        if pj_template_filepath.exists():
-            content = pj_template_filepath.read_text()
-        else:
+            case _:
+                pj_forge_dirpath = None
+        content = None
+        if pj_forge_dirpath is not None:
+            pj_template_filepath = (
+                pj_forge_dirpath / "ISSUE_TEMPLATE" / template_file
+            )
+            if pj_template_filepath.exists():
+                content = pj_template_filepath.read_text()
+        if content is None:
             template_resource = resources.files("gitforge").joinpath(
                 "assets", "ISSUE_TEMPLATE", template_file
             )
