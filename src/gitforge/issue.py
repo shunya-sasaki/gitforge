@@ -5,7 +5,10 @@ from importlib import resources
 from pathlib import Path
 from typing import Annotated
 
+import pyperclip
 import typer
+from rich.console import Console
+from rich.markdown import Markdown
 
 from gitforge.utils import TextSanitizer
 
@@ -83,15 +86,31 @@ class Issue:
     def view(
         self,
         number: Annotated[int, typer.Argument(help="Issue number")],
+        comments: Annotated[
+            bool, typer.Option(help="View issue comments")
+        ] = True,
     ):
         """View an issue."""
         match self.backend:
             case "GitHub":
                 cmds = ["gh", "issue", "view", f"{number}"]
-
+                proc = subprocess.run(cmds, capture_output=True)
+                text = proc.stdout.decode()
+                if comments:
+                    cmds = ["gh", "issue", "view", f"{number}", "--comments"]
+                proc = subprocess.run(cmds, capture_output=True)
+                text += "\n" + proc.stdout.decode()
             case "Gitea":
                 cmds = ["tea", "issue", f"{number}"]
-        self._run(cmds)
+                if comments:
+                    cmds.append("--comments")
+                proc = subprocess.run(cmds, capture_output=True)
+                text = proc.stdout.decode()
+        console = Console()
+        markdown = Markdown(markup=text)
+        console.print(markdown)
+        pyperclip.copy(text)
+        console.print("Copied contents to the clipboard.", "bold blue")
 
     def template(
         self,
