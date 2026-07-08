@@ -110,7 +110,7 @@ class Issue:
         markdown = Markdown(markup=text)
         console.print(markdown)
         pyperclip.copy(text)
-        console.print("Copied contents to the clipboard.", "bold blue")
+        console.print("\nCopied contents to the clipboard.", style="bold blue")
 
     def template(
         self,
