@@ -31,7 +31,7 @@ class Commit:
         if body is not None:
             body = TextSanitizer.strip_ansi(body)
             body = TextSanitizer.unescape_whitespace(body)
-            cmds = ["git", "commit", "-m", f'"{title}\n\n{body}"']
+            cmds = ["git", "commit", "-m", f"{title}\n\n{body}"]
         else:
             cmds = ["git", "commit", "-m", f"{title}"]
         self._run(cmds)
