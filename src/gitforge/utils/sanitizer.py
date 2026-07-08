@@ -1,0 +1,48 @@
+"""Utilities for sanitizing text.
+
+Provides helpers for removing ANSI escape sequences and for unescaping
+whitespace literals.
+"""
+
+import re
+
+_ANSI_ESCAPE_PATTERN = re.compile(r"\x1b\[[0-9;?]*[ -/]*[@-~]")
+
+
+class TextSanitizer:
+    """Cleans text of characters that are unwanted in output.
+
+    Groups helpers for sanitizing text, such as removing ANSI escape
+    sequences and unescaping whitespace literals.
+    """
+
+    @classmethod
+    def strip_ansi(cls, text: str) -> str:
+        """Remove ANSI escape sequences from the given text.
+
+        Args:
+            text (str): The text that may contain ANSI escape sequences.
+
+        Returns:
+            str: The text with all ANSI escape sequences removed.
+
+        """
+        return _ANSI_ESCAPE_PATTERN.sub("", text)
+
+    @classmethod
+    def unescape_whitespace(cls, text: str) -> str:
+        r"""Convert escaped whitespace literals into real characters.
+
+        Turns the two-character sequences ``\n`` and ``\t`` into actual
+        newline and tab characters.
+
+        Args:
+            text (str): The text containing escaped whitespace literals.
+
+        Returns:
+            str: The text with `\n` and `\t` literals unescaped.
+
+        """
+        out = text.replace("\\n", "\n")
+        out = out.replace("\\t", "\t")
+        return out
