@@ -130,14 +130,16 @@ class PullRequest:
         match self.backend:
             case "GitHub":
                 pj_forge_dirpath = Path(".github")
-                pj_template_filepath = pj_forge_dirpath / template_file
-                content = pj_template_filepath.read_text()
             case "Gitea":
                 pj_forge_dirpath = Path(".gitea")
-                pj_template_filepath = pj_forge_dirpath / template_file
-                content = pj_template_filepath.read_text()
             case _:
-                content = None
+                pj_forge_dirpath = None
+        content = None
+        pj_template_filepath = None
+        if pj_forge_dirpath is not None:
+            pj_template_filepath = pj_forge_dirpath / template_file
+            if pj_template_filepath.exists():
+                content = pj_template_filepath.read_text()
         if content is None:
             template_resource = resources.files("gitforge").joinpath(
                 "assets", template_file
@@ -146,7 +148,13 @@ class PullRequest:
                 content = template_resource.read_text()
             except UnicodeDecodeError:
                 content = template_resource.read_text(encoding="utf-8")
-        if create and not pj_template_filepath.exists():
-            print("Create a template")
-
+        if (
+            create
+            and pj_forge_dirpath is not None
+            and pj_template_filepath is not None
+            and not pj_template_filepath.exists()
+        ):
+            pj_forge_dirpath.mkdir(parents=True, exist_ok=True)
+            pj_template_filepath.write_text(content)
+            print(f"Created {pj_template_filepath}")
         print(content)
