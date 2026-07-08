@@ -7,6 +7,8 @@ from typing import Annotated
 
 import typer
 
+from gitforge.utils import TextSanitizer
+
 
 class PullRequest:
     """Pull request command wrapper."""
@@ -53,7 +55,9 @@ class PullRequest:
         ] = None,
     ):
         """Create a new pull request."""
-        body = body.replace("\\n", "\n").replace("\\t", "\t")
+        title = TextSanitizer.strip_ansi(title)
+        body = TextSanitizer.unescape_whitespace(body)
+        body = TextSanitizer.strip_ansi(body)
         match self.backend:
             case "GitHub":
                 cmds = [
