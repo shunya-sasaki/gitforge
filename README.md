@@ -32,6 +32,20 @@ Run without arguments to see all available commands:
 gf --help
 ```
 
+### Local git
+
+```sh
+gf commit --title "Title"               # commit staged changes
+gf commit --title "Title" --body "Body" # commit with a title and body
+gf diff                                 # diff of uncommitted changes vs HEAD
+gf diff main                            # diff between main and HEAD
+gf diff --no-copy                       # print the diff without copying it
+gf browse                               # open the repository in the browser
+```
+
+By default `gf diff` copies the diff to the system clipboard; pass
+`--no-copy` (`-n`) to disable it.
+
 ### Pull requests
 
 ```sh
