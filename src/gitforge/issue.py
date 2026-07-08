@@ -7,6 +7,8 @@ from typing import Annotated
 
 import typer
 
+from gitforge.utils import TextSanitizer
+
 
 class Issue:
     """Issue commands wrapper."""
@@ -47,7 +49,9 @@ class Issue:
         ] = None,
     ):
         """Create a new issue."""
-        body = body.replace("\\n", "\n").replace("\\t", "\t")
+        title = TextSanitizer.strip_ansi(title)
+        body = TextSanitizer.unescape_whitespace(body)
+        body = TextSanitizer.strip_ansi(body)
         match self.backend:
             case "GitHub":
                 cmds = [
