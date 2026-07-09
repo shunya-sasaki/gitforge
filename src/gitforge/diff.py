@@ -1,11 +1,12 @@
 """Show changes between commits, commit and working tree, etc."""
 
 import subprocess
-import sys
 from typing import Annotated
 
 import pyperclip
 import typer
+
+from gitforge.utils import TextSanitizer
 
 
 class Diff:
@@ -27,9 +28,7 @@ class Diff:
         encoding with ``errors="replace"`` guarantees ``print`` never
         raises ``UnicodeEncodeError``.
         """
-        encoding = sys.stdout.encoding or "utf-8"
-        safe = text.encode(encoding, errors="replace").decode(encoding)
-        print(safe, end="")
+        print(TextSanitizer.encode_safe(text), end="")
 
     def diff(
         self,

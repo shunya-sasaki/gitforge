@@ -108,7 +108,10 @@ class Issue:
                 text = proc.stdout.decode()
         console = Console()
         markdown = Markdown(markup=text)
-        console.print(markdown)
+        try:
+            console.print(markdown)
+        except UnicodeError:
+            print(TextSanitizer.encode_safe(text))
         pyperclip.copy(text)
         console.print("\nCopied contents to the clipboard.", style="bold blue")
 

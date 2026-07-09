@@ -5,6 +5,7 @@ whitespace literals.
 """
 
 import re
+import sys
 
 _ANSI_ESCAPE_PATTERN = re.compile(r"\x1b\[[0-9;?]*[ -/]*[@-~]")
 
@@ -46,3 +47,21 @@ class TextSanitizer:
         out = text.replace("\\n", "\n")
         out = out.replace("\\t", "\t")
         return out
+
+    @classmethod
+    def encode_safe(cls, text: str) -> str:
+        """Round-trip text through the console encoding safely.
+
+        Replaces characters the current stdout encoding cannot
+        represent so that printing never raises ``UnicodeError`` on
+        consoles such as Windows cp932.
+
+        Args:
+            text (str): The text to make safe for the console.
+
+        Returns:
+            str: The text with un-encodable characters replaced.
+
+        """
+        encoding = sys.stdout.encoding or "utf-8"
+        return text.encode(encoding, errors="replace").decode(encoding)
