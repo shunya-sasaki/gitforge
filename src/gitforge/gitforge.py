@@ -51,7 +51,7 @@ class GitForge:
 
     def _is_backend_github(self, remote_url: str, limit: int = 255) -> bool:
         cmds = ["gh", "auth", "status"]
-        proc = subprocess.run(cmds)
+        proc = subprocess.run(cmds, capture_output=True)
         if proc.returncode == 1:
             return False
         proc = subprocess.run(
