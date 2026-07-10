@@ -5,11 +5,11 @@ from importlib import resources
 from pathlib import Path
 from typing import Annotated
 
-import pyperclip
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
 
+from gitforge.utils import Clipboard
 from gitforge.utils import TextSanitizer
 
 
@@ -112,7 +112,7 @@ class Issue:
             console.print(markdown)
         except UnicodeError:
             print(TextSanitizer.encode_safe(text))
-        pyperclip.copy(text)
+        Clipboard.copy(text)
         console.print("\nCopied contents to the clipboard.", style="bold blue")
 
     def template(

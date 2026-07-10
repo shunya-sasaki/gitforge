@@ -4,7 +4,6 @@ import subprocess
 import sys
 from typing import Annotated
 
-import pyperclip
 import typer
 
 from gitforge.utils import TextSanitizer
