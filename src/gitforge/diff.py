@@ -3,9 +3,10 @@
 import subprocess
 from typing import Annotated
 
-import pyperclip
 import typer
 
+from gitforge.utils import Clipboard
+from gitforge.utils import ClipboardError
 from gitforge.utils import TextSanitizer
 
 
@@ -65,8 +66,8 @@ class Diff:
             output = proc.stdout.decode("utf-8", errors="replace")
             self._print_safe(output)
             try:
-                pyperclip.copy(output)
-            except pyperclip.PyperclipException as exc:
+                Clipboard.copy(output)
+            except ClipboardError as exc:
                 print(f"\nFailed to copy to the clipboard: {exc}")
             else:
                 print("\nCopied the diff to the clipboard.")
