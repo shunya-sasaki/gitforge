@@ -127,15 +127,18 @@ class PullRequest:
     ):
         """View a template."""
         template_file = "pull_request_template.md"
+        content = None
         match self.backend:
             case "GitHub":
                 pj_forge_dirpath = Path(".github")
                 pj_template_filepath = pj_forge_dirpath / template_file
-                content = pj_template_filepath.read_text()
+                if pj_template_filepath.exists():
+                    content = pj_template_filepath.read_text()
             case "Gitea":
                 pj_forge_dirpath = Path(".gitea")
                 pj_template_filepath = pj_forge_dirpath / template_file
-                content = pj_template_filepath.read_text()
+                if pj_template_filepath.exists():
+                    content = pj_template_filepath.read_text()
             case _:
                 content = None
         if content is None:
