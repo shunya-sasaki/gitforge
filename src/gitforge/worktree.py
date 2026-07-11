@@ -1,10 +1,27 @@
 """Worktree commands wrapper class."""
 
+import re
 import subprocess
+from dataclasses import asdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated
+from typing import Literal
 
 import typer
+from rich.console import Console
+from rich.table import Table
+
+from gitforge.utils import TextSanitizer
+
+_BRANCH_BRACKET_PATTERN = re.compile(r"^\[(.*)\]$")
+
+
+@dataclass
+class _WorktreeItem:
+    path: str
+    branch: str
+    commit_hash: str
 
 
 class Worktree:
@@ -16,6 +33,7 @@ class Worktree:
         self.app = typer.Typer(help="Manage worktrees", no_args_is_help=True)
         self.app.command()(self.add)
         self.app.command()(self.remove)
+        self.app.command()(self.list)
 
     def _run(self, cmds: list[str]):
         """Run a forge command, streaming its output to the terminal."""
@@ -45,6 +63,45 @@ class Worktree:
             print(f"Worktree does not exist: {path}")
             return
         self._run(["git", "worktree", "remove", str(path)])
+
+    def list(
+        self,
+        format: Annotated[
+            Literal["plain", "json", "table"],
+            typer.Option(help="Output format."),
+        ] = "table",
+    ):
+        """List details of each worktree."""
+        proc = subprocess.run(["git", "worktree", "list"], capture_output=True)
+        text = TextSanitizer.decode_safe(proc.stdout)
+        lines = text.splitlines()
+        items = []
+        for line in lines:
+            path, commit_hash, branch = line.split()
+            branch = _BRANCH_BRACKET_PATTERN.sub(r"\1", branch)
+            item = _WorktreeItem(
+                path=path, commit_hash=commit_hash, branch=branch
+            )
+            items.append(item)
+        match format:
+            case "plain":
+                for item in items:
+                    print(f"{item.path} {item.commit_hash} [{item.branch}]")
+            case "json":
+                list_dict = [asdict(item) for item in items]
+                print(list_dict)
+            case "table":
+                table = Table(title="Worktree list")
+                table.add_column("Worktree Path")
+                table.add_column("Commit Hash")
+                table.add_column("Branch")
+                for item in items:
+                    table.add_row(item.path, item.commit_hash, item.branch)
+                console = Console()
+                console.print(table)
+
+    def switch(self, branch):
+        """Switch worktree."""
 
     def _repo_name(self, remote_name: str = "origin") -> str:
         """Get the repository name from the remote URL."""
