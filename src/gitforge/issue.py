@@ -95,17 +95,17 @@ class Issue:
             case "GitHub":
                 cmds = ["gh", "issue", "view", f"{number}"]
                 proc = subprocess.run(cmds, capture_output=True)
-                text = proc.stdout.decode()
+                text = TextSanitizer.decode_safe(proc.stdout)
                 if comments:
                     cmds = ["gh", "issue", "view", f"{number}", "--comments"]
                 proc = subprocess.run(cmds, capture_output=True)
-                text += "\n" + proc.stdout.decode()
+                text += "\n" + TextSanitizer.decode_safe(proc.stdout)
             case "Gitea":
                 cmds = ["tea", "issue", f"{number}"]
                 if comments:
                     cmds.append("--comments")
                 proc = subprocess.run(cmds, capture_output=True)
-                text = proc.stdout.decode()
+                text = TextSanitizer.decode_safe(proc.stdout)
         console = Console()
         markdown = Markdown(markup=text)
         try:
