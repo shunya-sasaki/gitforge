@@ -49,6 +49,25 @@ class TextSanitizer:
         return out
 
     @classmethod
+    def decode_safe(cls, data: bytes, encoding: str = "utf-8") -> str:
+        """Decode bytes into text without raising on invalid bytes.
+
+        Replaces byte sequences that are not valid in the given
+        encoding so that decoding subprocess output never raises
+        ``UnicodeDecodeError``.
+
+        Args:
+            data (bytes): The bytes to decode.
+            encoding (str): The encoding to decode with. Defaults to
+                ``"utf-8"``.
+
+        Returns:
+            str: The decoded text with un-decodable bytes replaced.
+
+        """
+        return data.decode(encoding, errors="replace")
+
+    @classmethod
     def encode_safe(cls, text: str) -> str:
         """Round-trip text through the console encoding safely.
 
