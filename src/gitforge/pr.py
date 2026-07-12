@@ -23,6 +23,7 @@ class PullRequest:
         self.app.command()(self.create)
         self.app.command()(self.view)
         self.app.command()(self.merge)
+        self.app.command()(self.review)
         self.app.command()(self.template)
 
     def _run(self, cmds: list[str]):
@@ -153,3 +154,17 @@ class PullRequest:
             print("Create a template")
 
         print(content)
+
+    def review(
+        self,
+        number: Annotated[
+            int, typer.Argument(help="The number of pull request")
+        ],
+    ) -> None:
+        """Add a review to pull request."""
+        match self.backend:
+            case "GitHub":
+                cmds = ["gh", "pr", "review", f"{number}"]
+            case "Gitea":
+                cmds = ["tea", "pr", "review", f"{number}"]
+        subprocess.run(cmds)
