@@ -1,8 +1,10 @@
 """Gitforge class that wraps coommand for git forges such as GitHub, Gitea."""
 
+import io
 import json
 import shutil
 import subprocess
+import sys
 from typing import Literal
 
 import typer
@@ -141,7 +143,14 @@ def run():
     Builds a :class:`GitForge` instance, which detects the available
     backend and registers the subcommands, then dispatches the Typer
     application to handle the invoked command.
+
+    Reconfigures stdout/stderr to UTF-8 first so output does not raise
+    ``UnicodeEncodeError`` when the streams are piped to a legacy code
+    page (e.g. Windows cp932 under OpenCode).
     """
+    for stream in (sys.stdout, sys.stderr):
+        if isinstance(stream, io.TextIOWrapper):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     forge = GitForge()
     forge.app()
 
