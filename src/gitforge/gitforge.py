@@ -25,6 +25,11 @@ class GitForge:
     def __init__(self, remote_name: str = "origin"):
         """Initializer of GitForge."""
         self.is_git_available = self._is_installed("git")
+        if not self._is_inside_work_tree():
+            raise RuntimeError(
+                "Not inside a git worktree. "
+                "Run gitforge from within a git repository."
+            )
         self.is_gh_available = self._is_installed("gh")
         self.is_tea_available = self._is_installed("tea")
         self.backend = self._detect_backend(remote_name)
@@ -43,6 +48,14 @@ class GitForge:
         self.app.add_typer(label.app, name="label")
         self.app.add_typer(pr.app, name="pr")
         self.app.add_typer(worktree.app, name="worktree")
+
+    def _is_inside_work_tree(self) -> bool:
+        cmds = ["git", "rev-parse", "--is-inside-work-tree"]
+        proc = subprocess.run(cmds, capture_output=True)
+        if proc.returncode == 0:
+            return True
+        else:
+            return False
 
     def _is_installed(self, cmd: Literal["git", "gh", "tea"]) -> bool:
         ret = shutil.which(cmd=cmd)
