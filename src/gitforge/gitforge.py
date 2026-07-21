@@ -33,7 +33,6 @@ class GitForge:
                 + "Run gitforge from within a git repository.",
                 style="red",
             )
-            raise RuntimeError()
         self.is_gh_available = self._is_installed("gh")
         self.is_tea_available = self._is_installed("tea")
         self.backend = self._detect_backend(remote_name)
