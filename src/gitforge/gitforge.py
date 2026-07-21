@@ -8,6 +8,7 @@ import sys
 from typing import Literal
 
 import typer
+from rich.console import Console
 
 from gitforge.browse import Browse
 from gitforge.commit import Commit
@@ -24,12 +25,15 @@ class GitForge:
 
     def __init__(self, remote_name: str = "origin"):
         """Initializer of GitForge."""
+        self.console = Console()
         self.is_git_available = self._is_installed("git")
         if not self._is_inside_work_tree():
-            raise RuntimeError(
+            self.console.print(
                 "Not inside a git worktree. "
-                "Run gitforge from within a git repository."
+                + "Run gitforge from within a git repository.",
+                style="red",
             )
+            raise RuntimeError()
         self.is_gh_available = self._is_installed("gh")
         self.is_tea_available = self._is_installed("tea")
         self.backend = self._detect_backend(remote_name)
