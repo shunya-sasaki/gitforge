@@ -17,6 +17,26 @@ from gitforge.utils import TextSanitizer
 _BRANCH_BRACKET_PATTERN = re.compile(r"^\[(.*)\]$")
 
 
+def _complete_branch(incomplete: str) -> list[str]:
+    """Suggest existing worktree branches for shell completion.
+
+    Runs standalone in the completion subprocess (Typer invokes the
+    binary again with the completion environment), so it queries git
+    directly instead of relying on any :class:`Worktree` instance.
+    """
+    proc = subprocess.run(["git", "worktree", "list"], capture_output=True)
+    text = TextSanitizer.decode_safe(proc.stdout)
+    branches = []
+    for line in text.splitlines():
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+        branch = _BRANCH_BRACKET_PATTERN.sub(r"\1", parts[2])
+        if branch.startswith(incomplete):
+            branches.append(branch)
+    return branches
+
+
 @dataclass
 class _WorktreeItem:
     path: str
@@ -34,6 +54,7 @@ class Worktree:
         self.app.command()(self.add)
         self.app.command()(self.remove)
         self.app.command()(self.list)
+        self.app.command()(self.switch)
 
     def _run(self, cmds: list[str]):
         """Run a forge command, streaming its output to the terminal."""
@@ -64,14 +85,7 @@ class Worktree:
             return
         self._run(["git", "worktree", "remove", str(path)])
 
-    def list(
-        self,
-        format: Annotated[
-            Literal["plain", "json", "table"],
-            typer.Option(help="Output format."),
-        ] = "table",
-    ):
-        """List details of each worktree."""
+    def _worktree_list(self) -> list[_WorktreeItem]:
         proc = subprocess.run(["git", "worktree", "list"], capture_output=True)
         text = TextSanitizer.decode_safe(proc.stdout)
         lines = text.splitlines()
@@ -83,6 +97,17 @@ class Worktree:
                 path=path, commit_hash=commit_hash, branch=branch
             )
             items.append(item)
+        return items
+
+    def list(
+        self,
+        format: Annotated[
+            Literal["plain", "json", "table"],
+            typer.Option(help="Output format."),
+        ] = "table",
+    ):
+        """List details of each worktree."""
+        items = self._worktree_list()
         match format:
             case "plain":
                 for item in items:
@@ -100,8 +125,27 @@ class Worktree:
                 console = Console()
                 console.print(table)
 
-    def switch(self, branch):
-        """Switch worktree."""
+    def switch(
+        self,
+        branch: Annotated[
+            str,
+            typer.Argument(
+                help="Branch name",
+                autocompletion=_complete_branch,
+            ),
+        ],
+    ):
+        """Print the worktree path for a branch.
+
+        Intended to be run through the ``gf`` shell wrapper, which
+        changes the current directory to the printed path. Errors go to
+        stderr with a non-zero exit so the wrapper does not ``cd``.
+        """
+        path = self._worktree_path(branch)
+        if not path.exists():
+            typer.echo(f"Worktree does not exist: {path}", err=True)
+            raise typer.Exit(code=1)
+        print(path)
 
     def _repo_name(self, remote_name: str = "origin") -> str:
         """Get the repository name from the remote URL."""
