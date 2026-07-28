@@ -141,8 +141,12 @@ class Worktree:
         changes the current directory to the printed path. Errors go to
         stderr with a non-zero exit so the wrapper does not ``cd``.
         """
-        path = self._worktree_path(branch)
-        if not path.exists():
+        items = self._worktree_list()
+        path = None
+        for item in items:
+            if item.branch == branch:
+                path = Path(item.path)
+        if path is not None and not path.exists():
             typer.echo(f"Worktree does not exist: {path}", err=True)
             raise typer.Exit(code=1)
         print(path)
