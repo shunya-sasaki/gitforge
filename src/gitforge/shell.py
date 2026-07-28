@@ -15,7 +15,8 @@ Users install the function by evaluating the output of
 Each shell's snippet also aliases tab-completion so that `gf` is
 completed exactly like ``gitforge`` (zsh and bash require
 ``gitforge --install-completion`` to have registered the completion
-first; fish inherits it automatically through ``--wraps``).
+first; fish inherits it automatically through ``--wraps``; PowerShell
+registers a completer that delegates to ``gitforge``).
 """
 
 from typing import Annotated
@@ -23,7 +24,7 @@ from typing import Literal
 
 import typer
 
-Shell = Literal["zsh", "bash", "fish"]
+Shell = Literal["zsh", "bash", "fish", "pwsh"]
 
 _ZSH_INIT = """\
 gf() {
@@ -75,10 +76,43 @@ function gf --wraps gitforge
 end
 """
 
+_PWSH_INIT = """\
+function gf {
+    if ($args[0] -eq 'worktree' -and $args[1] -eq 'switch') {
+        $_gf_dir = & gitforge @args
+        if ($LASTEXITCODE -ne 0) { return }
+        if ($_gf_dir) {
+            Set-Location -LiteralPath $_gf_dir
+        }
+    } else {
+        & gitforge @args
+    }
+}
+
+$_gf_completer = {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    $Env:_GITFORGE_COMPLETE = "complete_powershell"
+    $Env:_TYPER_COMPLETE_ARGS = $commandAst.ToString()
+    $Env:_TYPER_COMPLETE_WORD_TO_COMPLETE = $wordToComplete
+    gitforge | ForEach-Object {
+        $commandArray = $_ -Split ":::"
+        $command = $commandArray[0]
+        $helpString = $commandArray[1]
+        [System.Management.Automation.CompletionResult]::new(
+            $command, $command, 'ParameterValue', $helpString)
+    }
+    $Env:_GITFORGE_COMPLETE = ""
+    $Env:_TYPER_COMPLETE_ARGS = ""
+    $Env:_TYPER_COMPLETE_WORD_TO_COMPLETE = ""
+}
+Register-ArgumentCompleter -Native -CommandName gf -ScriptBlock $_gf_completer
+"""
+
 _SHELL_INIT: dict[str, str] = {
     "zsh": _ZSH_INIT,
     "bash": _BASH_INIT,
     "fish": _FISH_INIT,
+    "pwsh": _PWSH_INIT,
 }
 
 
@@ -86,7 +120,8 @@ def shell_init(shell: Shell) -> str:
     """Return the ``gf`` wrapper function source for a shell.
 
     Args:
-        shell: Target shell, one of ``zsh``, ``bash`` or ``fish``.
+        shell: Target shell, one of ``zsh``, ``bash``, ``fish`` or
+            ``pwsh``.
 
     Returns:
         The shell function definition to be evaluated by the shell.
