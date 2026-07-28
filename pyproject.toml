@@ -11,7 +11,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-gf = "gitforge:run"
+gitforge = "gitforge:run"
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
