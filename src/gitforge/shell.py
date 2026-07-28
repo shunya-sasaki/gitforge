@@ -1,18 +1,18 @@
-"""Shell integration for the ``gf`` wrapper function.
+"""Shell integration for the `gf` wrapper function.
 
-The ``gitforge`` binary runs as a child process and therefore cannot
+The `gitforge` binary runs as a child process and therefore cannot
 change the current directory of the parent shell. To support
-``gf worktree switch``, a small shell function named ``gf`` wraps the
-binary: for ``worktree switch`` it captures the path printed by
-``gitforge`` and runs ``cd`` itself; every other invocation is passed
+`gf worktree switch`, a small shell function named `gf` wraps the
+binary: for `worktree switch` it captures the path printed by
+`gitforge` and runs ``cd`` itself; every other invocation is passed
 straight through.
 
 Users install the function by evaluating the output of
-``gitforge shell-init`` from their shell startup file, e.g.::
+`gitforge shell-init` from their shell startup file, e.g.::
 
     eval "$(gitforge shell-init zsh)"
 
-Each shell's snippet also aliases tab-completion so that ``gf`` is
+Each shell's snippet also aliases tab-completion so that `gf` is
 completed exactly like ``gitforge`` (zsh and bash require
 ``gitforge --install-completion`` to have registered the completion
 first; fish inherits it automatically through ``--wraps``).
