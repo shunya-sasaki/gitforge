@@ -20,6 +20,38 @@ This program is a wapper of `gh` and `tea` that are CLI tools for Git forges.
 uv tool install git+https://github.com/shunya-sasaki/gitforge
 ```
 
+## 🐚 Shell integration
+
+The examples below use `gf`, a thin shell wrapper around `gitforge`.
+It is required for `gf worktree switch`, which changes the current
+directory of your shell (a child process cannot do this on its own);
+every other command is passed straight through to `gitforge`.
+
+Install it by evaluating the output of `gitforge shell-init` from your
+shell startup file:
+
+```sh
+# zsh (~/.zshrc)
+eval "$(gitforge shell-init zsh)"
+
+# bash (~/.bashrc)
+eval "$(gitforge shell-init bash)"
+```
+
+```fish
+# fish (~/.config/fish/config.fish)
+gitforge shell-init fish | source
+```
+
+```powershell
+# PowerShell ($PROFILE)
+gitforge shell-init pwsh | Out-String | Invoke-Expression
+```
+
+Each snippet also mirrors `gitforge`'s tab-completion onto `gf`. For
+zsh and bash, run `gitforge --install-completion` once first to
+register the completion.
+
 ## 🚀 Usage
 
 `gitforge` auto-detects whether the current repository is hosted on
