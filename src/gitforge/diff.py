@@ -4,6 +4,7 @@ import subprocess
 from typing import Annotated
 
 import typer
+from rich.console import Console
 
 from gitforge.utils import Clipboard
 from gitforge.utils import ClipboardError
@@ -16,6 +17,7 @@ class Diff:
     def __init__(self, backend):
         """Initialize the Diff command wrapper."""
         self.backend = backend
+        self.console = Console()
 
     def _run(self, cmds: list[str]):
         """Run a forge command, streaming its output to the terminal."""
@@ -79,8 +81,13 @@ class Diff:
             try:
                 Clipboard.copy(output)
             except ClipboardError as exc:
-                print(f"\nFailed to copy to the clipboard: {exc}")
+                self.console.print(
+                    f"\nFailed to copy to the clipboard: {exc}",
+                    style="bold red",
+                )
             else:
-                print("\nCopied the diff to the clipboard.")
+                self.console.print(
+                    "\nCopied the diff to the clipboard.", style="bold green"
+                )
         else:
             self._run(cmds)
