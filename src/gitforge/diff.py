@@ -36,6 +36,14 @@ class Diff:
         branch: Annotated[
             str | None, typer.Argument(help="Branch name to compare against")
         ] = None,
+        previous: Annotated[
+            bool,
+            typer.Option(
+                "--previous/--no-previous",
+                "-p/-P",
+                help="Show the diff between the previous commit and HEAD.",
+            ),
+        ] = False,
         copy: Annotated[
             bool,
             typer.Option(
@@ -49,9 +57,12 @@ class Diff:
 
         Without `branch`, show the diff of the current uncommitted
         changes against `HEAD`. With `branch`, show the diff between
-        the given branch and `HEAD`.
+        the given branch and `HEAD`. With `--previous`, show the diff
+        between the previous commit and `HEAD`.
         """
-        if branch is None:
+        if previous:
+            cmds = ["git", "--no-pager", "diff", "--no-color", "HEAD~..HEAD"]
+        elif branch is None:
             cmds = ["git", "--no-pager", "diff", "--no-color", "HEAD"]
         else:
             cmds = [
