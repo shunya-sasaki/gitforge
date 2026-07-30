@@ -50,9 +50,14 @@ class Clipboard:
     def _copy_osc52(cls, text: str) -> None:
         """Ask the terminal emulator to copy the text via OSC52.
 
-        The text is base64-encoded and written to ``stdout`` inside an
-        OSC52 escape sequence. When ``TMUX`` is set, the sequence is
-        wrapped in a tmux passthrough so it reaches the outer terminal.
+        The text is base64-encoded and written inside an OSC52 escape
+        sequence to the controlling terminal (``/dev/tty``) rather than
+        to ``stdout``, so the terminal emulator receives it even when
+        ``stdout`` is a pipe. That is the case whenever the command runs
+        inside a TUI that captures its output, such as lazygit. When no
+        controlling terminal is available, ``stdout`` is used instead.
+        When ``TMUX`` is set, the sequence is wrapped in a tmux
+        passthrough so it reaches the outer terminal.
 
         Args:
             text (str): The text to copy to the clipboard.
@@ -62,5 +67,9 @@ class Clipboard:
         sequence = f"\x1b]52;c;{payload}\x07"
         if os.environ.get("TMUX"):
             sequence = f"\x1bPtmux;\x1b{sequence}\x1b\\"
-        sys.stdout.write(sequence)
-        sys.stdout.flush()
+        try:
+            with open("/dev/tty", "w") as tty:
+                tty.write(sequence)
+        except OSError:
+            sys.stdout.write(sequence)
+            sys.stdout.flush()
