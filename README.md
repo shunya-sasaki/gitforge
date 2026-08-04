@@ -71,12 +71,18 @@ gf commit --title "Title"               # commit staged changes
 gf commit --title "Title" --body "Body" # commit with a title and body
 gf diff                                 # diff of uncommitted changes vs HEAD
 gf diff main                            # diff between main and HEAD
+gf diff --untracked                     # ...including untracked files
 gf diff --no-copy                       # print the diff without copying it
 gf browse                               # open the repository in the browser
 ```
 
 By default `gf diff` copies the diff to the system clipboard; pass
 `--no-copy` (`-n`) to disable it.
+
+`gf diff` only covers files git already tracks. Pass `--untracked`
+(`-u`) to include untracked files as well; ignored files stay out. The
+option applies to the `HEAD` diff only, not to `gf diff <branch>` or
+`gf diff --previous`.
 
 ### Pull requests
 
