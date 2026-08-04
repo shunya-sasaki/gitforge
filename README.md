@@ -67,6 +67,8 @@ gf --help
 ### Local git
 
 ```sh
+gf status                               # short status, HEAD hash, last commit
+gf status --no-copy                     # print the status without copying it
 gf commit --title "Title"               # commit staged changes
 gf commit --title "Title" --body "Body" # commit with a title and body
 gf diff                                 # diff of uncommitted changes vs HEAD
@@ -76,8 +78,12 @@ gf diff --no-copy                       # print the diff without copying it
 gf browse                               # open the repository in the browser
 ```
 
-By default `gf diff` copies the diff to the system clipboard; pass
-`--no-copy` (`-n`) to disable it.
+`gf status` reports the output of `git status --short`, `git rev-parse
+HEAD` and `git log -1 --oneline`, each under the command that produced
+it.
+
+By default `gf status` and `gf diff` copy their output to the system
+clipboard; pass `--no-copy` (`-n`) to disable it.
 
 `gf diff` only covers files git already tracks. Pass `--untracked`
 (`-u`) to include untracked files as well; ignored files stay out. The

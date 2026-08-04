@@ -18,6 +18,7 @@ from gitforge.label import Label
 from gitforge.models import ForgeUrl
 from gitforge.pr import PullRequest
 from gitforge.shell import shell_init_command
+from gitforge.status import Status
 from gitforge.worktree import Worktree
 
 
@@ -39,6 +40,7 @@ class GitForge:
         self._issue = Issue(None)
         self._label = Label(None)
         self._pr = PullRequest(None)
+        self._status = Status(None)
         self._worktree = Worktree(None)
         self._backend_commands = (
             self._browse,
@@ -47,12 +49,14 @@ class GitForge:
             self._issue,
             self._label,
             self._pr,
+            self._status,
             self._worktree,
         )
         self.app.callback()(self._setup)
         self.app.command(name="shell-init")(shell_init_command)
         self.app.command(name="diff")(self._diff.diff)
         self.app.command(name="commit")(self._commit.commit)
+        self.app.command(name="status")(self._status.status)
         self.app.command(name="browse")(self._browse.browse)
         self.app.add_typer(self._issue.app, name="issue")
         self.app.add_typer(self._label.app, name="label")

@@ -1,7 +1,6 @@
 """Record changes to the repository."""
 
 import subprocess
-import sys
 from typing import Annotated
 
 import typer
