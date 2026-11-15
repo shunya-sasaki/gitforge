@@ -95,7 +95,7 @@ option applies to the `HEAD` diff only, not to `gf diff <branch>` or
 ```sh
 gf pr list                              # list pull requests
 gf pr create --title "Title" --body "Body"   # create a pull request
-gf pr create --title "Title" --body "Body" --base dev --label bug
+gf pr create --title "Title" --body "Body" --base dev --label bug --label docs
 gf pr view 12                           # view PR #12
 gf pr merge 12                          # merge PR #12
 gf pr template                          # print the PR template
@@ -106,7 +106,7 @@ gf pr template                          # print the PR template
 ```sh
 gf issue list                           # list issues
 gf issue create --title "Title" --body "Body"   # create an issue
-gf issue create --title "Title" --body "Body" --label bug
+gf issue create --title "Title" --body "Body" -l bug,enhancement
 gf issue view 7                         # view issue #7
 gf issue template --label bug           # print an issue template
 ```

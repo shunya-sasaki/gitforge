@@ -1,5 +1,6 @@
 """Issue commands wrapper class."""
 
+import builtins
 import subprocess
 from importlib import resources
 from pathlib import Path
@@ -47,8 +48,12 @@ class Issue:
             str, typer.Option("--body", "-b", help="Body for the issue")
         ],
         label: Annotated[
-            str | None,
-            typer.Option("--label", "-l", help="Add labels by name"),
+            builtins.list[str] | None,
+            typer.Option(
+                "--label",
+                "-l",
+                help="Add labels by name (repeatable or comma-separated)",
+            ),
         ] = None,
     ):
         """Create a new issue."""
@@ -66,8 +71,8 @@ class Issue:
                     "--body",
                     body,
                 ]
-                if label is not None:
-                    cmds.extend(["--label", label])
+                if label:
+                    cmds.extend(["--label", ",".join(label)])
 
             case "Gitea":
                 cmds = [
@@ -79,8 +84,8 @@ class Issue:
                     "--description",
                     body,
                 ]
-                if label is not None:
-                    cmds.extend(["--labels", label])
+                if label:
+                    cmds.extend(["--labels", ",".join(label)])
         self._run(cmds)
 
     def view(
