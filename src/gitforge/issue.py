@@ -2,6 +2,7 @@
 
 import builtins
 import subprocess
+import sys
 from importlib import resources
 from pathlib import Path
 from typing import Annotated
@@ -24,6 +25,7 @@ class Issue:
         self.app.command()(self.list)
         self.app.command()(self.create)
         self.app.command()(self.view)
+        self.app.command()(self.comment)
         self.app.command()(self.template)
 
     def _run(self, cmds: list[str]):
@@ -119,6 +121,53 @@ class Issue:
             print(TextSanitizer.encode_safe(text))
         Clipboard.copy(text)
         console.print("\nCopied contents to the clipboard.", style="bold blue")
+
+    def comment(
+        self,
+        number: Annotated[int, typer.Argument(help="Issue number")],
+        body: Annotated[
+            str | None,
+            typer.Option("--body", "-b", help="Body for the comment"),
+        ] = None,
+        body_file: Annotated[
+            Path | None,
+            typer.Option(
+                "--body-file",
+                "-F",
+                help=(
+                    "Read body text from file"
+                    ' (use "-" to read from standard input)'
+                ),
+            ),
+        ] = None,
+    ):
+        """Add a comment to an issue."""
+        if (body is None) == (body_file is None):
+            typer.echo(
+                "Specify exactly one of --body or --body-file", err=True
+            )
+            raise typer.Exit(code=1)
+        if body_file is not None:
+            if str(body_file) == "-":
+                body = sys.stdin.read()
+            else:
+                body = body_file.read_text(encoding="utf-8")
+        else:
+            body = TextSanitizer.unescape_whitespace(body)
+        body = TextSanitizer.strip_ansi(body)
+        match self.backend:
+            case "GitHub":
+                cmds = ["gh", "issue", "comment", f"{number}", "--body", body]
+            case "Gitea":
+                cmds = [
+                    "tea",
+                    "comments",
+                    "add",
+                    f"{number}",
+                    "--description",
+                    body,
+                ]
+        self._run(cmds)
 
     def template(
         self,
