@@ -1,5 +1,6 @@
 """Pull request commands wrapper class."""
 
+import builtins
 import subprocess
 from importlib import resources
 from pathlib import Path
@@ -51,8 +52,12 @@ class PullRequest:
             str, typer.Option("--base", "-B", help="Target branch")
         ] = "main",
         label: Annotated[
-            str | None,
-            typer.Option("--label", "-l", help="Add label by name"),
+            builtins.list[str] | None,
+            typer.Option(
+                "--label",
+                "-l",
+                help="Add labels by name (repeatable or comma-separated)",
+            ),
         ] = None,
     ):
         """Create a new pull request."""
@@ -72,8 +77,8 @@ class PullRequest:
                 ]
                 if base is not None:
                     cmds.extend(["--base", base])
-                if label is not None:
-                    cmds.extend(["--label", label])
+                if label:
+                    cmds.extend(["--label", ",".join(label)])
 
             case "Gitea":
                 cmds = [
@@ -87,8 +92,8 @@ class PullRequest:
                 ]
                 if base is not None:
                     cmds.extend(["--base", base])
-                if label is not None:
-                    cmds.extend(["--labels", label])
+                if label:
+                    cmds.extend(["--labels", ",".join(label)])
         self._run(cmds)
 
     def view(
