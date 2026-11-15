@@ -108,6 +108,8 @@ gf issue list                           # list issues
 gf issue create --title "Title" --body "Body"   # create an issue
 gf issue create --title "Title" --body "Body" -l bug,enhancement
 gf issue view 7                         # view issue #7
+gf issue comment 7 --body "Comment"     # comment on issue #7
+gf issue comment 7 --body-file note.md  # comment from a file ("-" for stdin)
 gf issue template --label bug           # print an issue template
 ```
 
